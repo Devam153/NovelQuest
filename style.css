@@ -8,9 +8,9 @@
     font-family: 'Poppins', sans-serif;
 }
 
-/* Streamlit containers */
-.block-container {
-    padding-top: 2rem;
+/* Main container styling */
+.main {
+    padding: 2rem 3rem;
 }
 
 /* Header styling */
@@ -94,22 +94,37 @@ button[kind="secondary"]:hover {
     /* Indigo-700 */
 }
 
-/* Sidebar styling */
-.css-1d391kg {
-    background-color: #f5f7ff;
-}
-
 /* Info boxes */
 .stAlert {
     border-radius: 8px;
 }
 
-/* Footer styling */
-footer {
-    text-align: center;
-    margin-top: 3rem;
-    color: #6b7280;
-    /* Gray-500 */
+/* Tab styling */
+.stTabs [data-baseweb="tab-list"] {
+    gap: 1rem;
+}
+
+.stTabs [data-baseweb="tab"] {
+    height: 4rem;
+    white-space: pre-wrap;
+    border-radius: 4px 4px 0 0;
+    gap: 0.5rem;
+    padding: 1rem 1.5rem;
+    font-weight: 600;
+}
+
+.stTabs [aria-selected="true"] {
+    background-color: rgba(67, 56, 202, 0.1) !important;
+    color: #4338ca !important;
+}
+
+/* Form container */
+form {
+    background-color: #f8fafc;
+    padding: 1.5rem;
+    border-radius: 10px;
+    border: 1px solid #e5e7eb;
+    margin-bottom: 2rem;
 }
 
 /* Book card styling */
@@ -126,10 +141,17 @@ footer {
     transform: translateY(-4px);
 }
 
+/* Footer styling */
+footer {
+    text-align: center;
+    margin-top: 3rem;
+    color: #6b7280;
+}
+
 /* Responsive design adjustments */
 @media (max-width: 768px) {
-    .block-container {
-        padding-top: 1rem;
+    .main {
+        padding: 1rem;
     }
 
     h1 {
@@ -142,5 +164,9 @@ footer {
 
     h3 {
         font-size: 1.2rem !important;
+    }
+
+    .stTabs [data-baseweb="tab"] {
+        padding: 0.5rem 1rem;
     }
 }
