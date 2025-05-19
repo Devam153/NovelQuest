@@ -8,23 +8,24 @@
     font-family: 'Poppins', sans-serif;
 }
 
-/* Dark mode theme */
+/* Light mode theme (default) */
 body {
-    background-color: #121212;
-    color: #e0e0e0;
+    background-color: #f8f8f8;
+    color: #333333;
 }
 
 /* Main container styling */
 .main {
     padding: 2rem 3rem;
+    background-color: #ffffff;
 }
 
 /* Header styling */
 h1,
 h2,
 h3 {
-    color: #bb86fc;
-    /* Purple accent for dark mode */
+    color: #9b87f5;
+    /* Purple accent */
 }
 
 /* Button styling */
@@ -33,13 +34,13 @@ h3 {
     padding: 0.5rem 1rem;
     font-weight: 600;
     transition: all 0.3s ease;
-    background-color: #bb86fc;
-    color: #121212;
+    background-color: #9b87f5;
+    color: #ffffff;
 }
 
 .stButton>button:hover {
-    background-color: #9d4edd;
-    box-shadow: 0 4px 12px rgba(187, 134, 252, 0.3);
+    background-color: #7E69AB;
+    box-shadow: 0 4px 12px rgba(155, 135, 245, 0.3);
     transform: translateY(-2px);
 }
 
@@ -51,51 +52,94 @@ h3 {
 
 .stTextArea>div,
 .stTextInput>div {
-    border: 1px solid #3d4852;
+    border: 1px solid #d1d1d1;
+    background-color: #ffffff;
 }
 
 .stTextArea>div:focus,
 .stTextInput>div:focus {
-    border: 1px solid #bb86fc;
+    border: 1px solid #9b87f5;
 }
 
 /* Card styling */
 [data-testid="stExpander"] {
     border-radius: 10px;
-    border: 1px solid #3d4852;
+    border: 1px solid #e5e5e5;
     margin-bottom: 1rem;
     overflow: hidden;
     transition: all 0.3s ease;
-    background-color: #1e1e1e;
+    background-color: #ffffff;
 }
 
 [data-testid="stExpander"]:hover {
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
     transform: translateY(-2px);
 }
 
-/* Slider styling */
+/* Slider styling - fixed to avoid highlighting issues */
 .stSlider>div>div>div {
-    background-color: #bb86fc;
+    background-color: #9b87f5 !important;
+}
+
+/* Remove selection highlight from slider values */
+.stSlider [role="slider"] {
+    background-color: #9b87f5 !important;
+}
+
+.stSlider [role="slider"]:focus,
+.stSlider [role="slider"]:active,
+.stSlider [role="slider"]:hover {
+    box-shadow: none !important;
+    outline: none !important;
+}
+
+/* Fix highlighting on slider thumb */
+.streamlit-slider .thumb {
+    background-color: #9b87f5 !important;
+    border: none !important;
+}
+
+.streamlit-slider .track {
+    background-color: rgba(155, 135, 245, 0.3) !important;
+}
+
+/* Remove selection highlight */
+.streamlit-slider .thumb:focus,
+.streamlit-slider .thumb:active,
+.streamlit-slider .thumb:hover {
+    box-shadow: none !important;
+    outline: none !important;
+}
+
+/* Year slider specific fixes */
+[data-testid="stSlider"] [data-baseweb="slider"] {
+    background-color: #ffffff !important;
+}
+
+[data-testid="stSlider"] [data-baseweb="thumb"] {
+    background-color: #9b87f5 !important;
+    border-color: #9b87f5 !important;
 }
 
 /* Book card styling */
 [data-testid="container"] {
-    background-color: #1e1e1e;
+    background-color: #ffffff;
     border-radius: 10px;
     padding: 1rem;
     margin-bottom: 1rem;
     transition: all 0.3s ease;
+    border: 1px solid #e0e0e0;
 }
 
 [data-testid="container"]:hover {
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
     transform: translateY(-4px);
 }
 
 /* Tab styling */
 .stTabs [data-baseweb="tab-list"] {
     gap: 1rem;
+    background-color: #ffffff;
 }
 
 .stTabs [data-baseweb="tab"] {
@@ -105,16 +149,18 @@ h3 {
     gap: 0.5rem;
     padding: 1rem 1.5rem;
     font-weight: 600;
+    color: #555555;
+    background-color: #f3f3f3;
 }
 
 .stTabs [aria-selected="true"] {
-    background-color: rgba(187, 134, 252, 0.1) !important;
-    color: #bb86fc !important;
+    background-color: rgba(155, 135, 245, 0.1) !important;
+    color: #9b87f5 !important;
 }
 
 /* Checkbox styling */
 .stCheckbox label {
-    color: #e0e0e0;
+    color: #333333;
 }
 
 .stCheckbox [data-testid="stMarkdownContainer"] p {
@@ -130,7 +176,7 @@ footer {
 
 /* Links */
 a {
-    color: #bb86fc !important;
+    color: #9b87f5 !important;
     text-decoration: none;
 }
 
@@ -143,19 +189,69 @@ a:hover {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
     gap: 1rem;
+    background-color: #ffffff;
 }
 
 .book-card {
-    background-color: #1e1e1e;
+    background-color: #ffffff;
     border-radius: 10px;
     padding: 1rem;
     margin-bottom: 1rem;
     transition: all 0.3s ease;
+    border: 1px solid #e0e0e0;
 }
 
 .book-card:hover {
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
     transform: translateY(-4px);
+}
+
+/* Dropdown - make it look better */
+.stSelectbox {
+    background-color: #ffffff;
+}
+
+.stSelectbox>div>div {
+    background-color: #ffffff;
+    border: 1px solid #d1d1d1;
+}
+
+/* Fix for the select genres dropdown */
+[data-testid="stExpander"] {
+    background-color: #ffffff !important;
+    border-color: #d1d1d1;
+}
+
+/* Override Streamlit's default dark theme elements */
+.stApp {
+    background-color: #f8f8f8 !important;
+}
+
+.stApp [data-testid="stAppViewContainer"] {
+    background-color: #f8f8f8 !important;
+}
+
+/* Make sure all text is readable */
+p,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+span,
+label,
+div {
+    color: #333333;
+}
+
+/* Override slider track colors */
+.stSlider [data-baseweb="track"] {
+    background-color: rgba(155, 135, 245, 0.3) !important;
+}
+
+.stSlider [data-baseweb="tick"] {
+    background-color: #9b87f5 !important;
 }
 
 /* Responsive design adjustments */
@@ -175,4 +271,18 @@ a:hover {
     h3 {
         font-size: 1.2rem !important;
     }
+}
+
+/* Fix background colors for interactive elements */
+[data-testid="stForm"] {
+    background-color: #ffffff !important;
+    border-radius: 10px;
+    padding: 1rem;
+    border: 1px solid #e5e5e5;
+}
+
+/* Fix slider year labels */
+[data-testid="stSlider"] [data-testid="stTickBarMin"],
+[data-testid="stSlider"] [data-testid="stTickBarMax"] {
+    color: #333333 !important;
 }
