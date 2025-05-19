@@ -8,6 +8,12 @@
     font-family: 'Poppins', sans-serif;
 }
 
+/* Dark mode theme */
+body {
+    background-color: #121212;
+    color: #e0e0e0;
+}
+
 /* Main container styling */
 .main {
     padding: 2rem 3rem;
@@ -17,8 +23,8 @@
 h1,
 h2,
 h3 {
-    color: #4338ca;
-    /* Indigo-700 */
+    color: #bb86fc;
+    /* Purple accent for dark mode */
 }
 
 /* Button styling */
@@ -27,50 +33,17 @@ h3 {
     padding: 0.5rem 1rem;
     font-weight: 600;
     transition: all 0.3s ease;
+    background-color: #bb86fc;
+    color: #121212;
 }
 
-/* Primary button */
-button[kind="primary"] {
-    background-color: #4338ca;
-    /* Indigo-700 */
-    color: white;
-}
-
-button[kind="primary"]:hover {
-    background-color: #3730a3;
-    /* Indigo-800 */
-    box-shadow: 0 4px 12px rgba(67, 56, 202, 0.3);
+.stButton>button:hover {
+    background-color: #9d4edd;
+    box-shadow: 0 4px 12px rgba(187, 134, 252, 0.3);
     transform: translateY(-2px);
 }
 
-/* Secondary button */
-button[kind="secondary"] {
-    border: 1px solid #4338ca;
-    color: #4338ca;
-    background-color: white;
-}
-
-button[kind="secondary"]:hover {
-    background-color: #eef2ff;
-    /* Indigo-50 */
-    box-shadow: 0 4px 12px rgba(67, 56, 202, 0.1);
-}
-
-/* Card styling */
-.stExpander {
-    border-radius: 10px;
-    border: 1px solid #e5e7eb;
-    margin-bottom: 1rem;
-    overflow: hidden;
-    transition: all 0.3s ease;
-}
-
-.stExpander:hover {
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-    transform: translateY(-2px);
-}
-
-/* Text areas and inputs */
+/* Form styling */
 .stTextArea,
 .stTextInput {
     border-radius: 8px;
@@ -78,25 +51,46 @@ button[kind="secondary"]:hover {
 
 .stTextArea>div,
 .stTextInput>div {
-    border: 1px solid #c7d2fe;
-    /* Indigo-200 */
+    border: 1px solid #3d4852;
 }
 
 .stTextArea>div:focus,
 .stTextInput>div:focus {
-    border: 1px solid #4338ca;
-    /* Indigo-700 */
+    border: 1px solid #bb86fc;
+}
+
+/* Card styling */
+[data-testid="stExpander"] {
+    border-radius: 10px;
+    border: 1px solid #3d4852;
+    margin-bottom: 1rem;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    background-color: #1e1e1e;
+}
+
+[data-testid="stExpander"]:hover {
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    transform: translateY(-2px);
 }
 
 /* Slider styling */
 .stSlider>div>div>div {
-    background-color: #4338ca;
-    /* Indigo-700 */
+    background-color: #bb86fc;
 }
 
-/* Info boxes */
-.stAlert {
-    border-radius: 8px;
+/* Book card styling */
+[data-testid="container"] {
+    background-color: #1e1e1e;
+    border-radius: 10px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    transition: all 0.3s ease;
+}
+
+[data-testid="container"]:hover {
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    transform: translateY(-4px);
 }
 
 /* Tab styling */
@@ -114,31 +108,17 @@ button[kind="secondary"]:hover {
 }
 
 .stTabs [aria-selected="true"] {
-    background-color: rgba(67, 56, 202, 0.1) !important;
-    color: #4338ca !important;
+    background-color: rgba(187, 134, 252, 0.1) !important;
+    color: #bb86fc !important;
 }
 
-/* Form container */
-form {
-    background-color: #f8fafc;
-    padding: 1.5rem;
-    border-radius: 10px;
-    border: 1px solid #e5e7eb;
-    margin-bottom: 2rem;
+/* Checkbox styling */
+.stCheckbox label {
+    color: #e0e0e0;
 }
 
-/* Book card styling */
-.book-card {
-    padding: 1rem;
-    border-radius: 10px;
-    background-color: white;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    transition: all 0.3s ease;
-}
-
-.book-card:hover {
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
-    transform: translateY(-4px);
+.stCheckbox [data-testid="stMarkdownContainer"] p {
+    font-size: 0.9rem;
 }
 
 /* Footer styling */
@@ -146,6 +126,36 @@ footer {
     text-align: center;
     margin-top: 3rem;
     color: #6b7280;
+}
+
+/* Links */
+a {
+    color: #bb86fc !important;
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+/* Book cards grid */
+.book-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1rem;
+}
+
+.book-card {
+    background-color: #1e1e1e;
+    border-radius: 10px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    transition: all 0.3s ease;
+}
+
+.book-card:hover {
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    transform: translateY(-4px);
 }
 
 /* Responsive design adjustments */
@@ -164,9 +174,5 @@ footer {
 
     h3 {
         font-size: 1.2rem !important;
-    }
-
-    .stTabs [data-baseweb="tab"] {
-        padding: 0.5rem 1rem;
     }
 }
