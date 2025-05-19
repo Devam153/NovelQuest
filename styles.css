@@ -1,0 +1,146 @@
+/* Main styles for NovelQuest */
+
+/* Custom font */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+/* Global styles */
+* {
+    font-family: 'Poppins', sans-serif;
+}
+
+/* Streamlit containers */
+.block-container {
+    padding-top: 2rem;
+}
+
+/* Header styling */
+h1,
+h2,
+h3 {
+    color: #4338ca;
+    /* Indigo-700 */
+}
+
+/* Button styling */
+.stButton>button {
+    border-radius: 8px;
+    padding: 0.5rem 1rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+/* Primary button */
+button[kind="primary"] {
+    background-color: #4338ca;
+    /* Indigo-700 */
+    color: white;
+}
+
+button[kind="primary"]:hover {
+    background-color: #3730a3;
+    /* Indigo-800 */
+    box-shadow: 0 4px 12px rgba(67, 56, 202, 0.3);
+    transform: translateY(-2px);
+}
+
+/* Secondary button */
+button[kind="secondary"] {
+    border: 1px solid #4338ca;
+    color: #4338ca;
+    background-color: white;
+}
+
+button[kind="secondary"]:hover {
+    background-color: #eef2ff;
+    /* Indigo-50 */
+    box-shadow: 0 4px 12px rgba(67, 56, 202, 0.1);
+}
+
+/* Card styling */
+.stExpander {
+    border-radius: 10px;
+    border: 1px solid #e5e7eb;
+    margin-bottom: 1rem;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.stExpander:hover {
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    transform: translateY(-2px);
+}
+
+/* Text areas and inputs */
+.stTextArea,
+.stTextInput {
+    border-radius: 8px;
+}
+
+.stTextArea>div,
+.stTextInput>div {
+    border: 1px solid #c7d2fe;
+    /* Indigo-200 */
+}
+
+.stTextArea>div:focus,
+.stTextInput>div:focus {
+    border: 1px solid #4338ca;
+    /* Indigo-700 */
+}
+
+/* Slider styling */
+.stSlider>div>div>div {
+    background-color: #4338ca;
+    /* Indigo-700 */
+}
+
+/* Sidebar styling */
+.css-1d391kg {
+    background-color: #f5f7ff;
+}
+
+/* Info boxes */
+.stAlert {
+    border-radius: 8px;
+}
+
+/* Footer styling */
+footer {
+    text-align: center;
+    margin-top: 3rem;
+    color: #6b7280;
+    /* Gray-500 */
+}
+
+/* Book card styling */
+.book-card {
+    padding: 1rem;
+    border-radius: 10px;
+    background-color: white;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+}
+
+.book-card:hover {
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+    transform: translateY(-4px);
+}
+
+/* Responsive design adjustments */
+@media (max-width: 768px) {
+    .block-container {
+        padding-top: 1rem;
+    }
+
+    h1 {
+        font-size: 1.8rem !important;
+    }
+
+    h2 {
+        font-size: 1.5rem !important;
+    }
+
+    h3 {
+        font-size: 1.2rem !important;
+    }
+}
