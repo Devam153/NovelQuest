@@ -2,10 +2,8 @@ import streamlit as st
 import os
 import json
 from book_recommender import get_book_recommendations, extract_books_from_response
-import google.generativeai as genai
 from dotenv import load_dotenv
 
-# Load environment variables and API key
 load_dotenv()
 api_key = os.getenv("GEMINI_API_KEY")
 
@@ -17,9 +15,321 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# Apply custom CSS
-with open("style.css") as f:
-    st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
+# Define CSS directly in the app
+css = """
+/* Custom font */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+/* Global styles */
+* {
+    font-family: 'Poppins', sans-serif;
+}
+
+/* Light mode theme (default) */
+body {
+    background-color: #f8f8f8;
+    color: #333333;
+}
+
+/* Main container styling */
+.main {
+    padding: 2rem 3rem;
+    background-color: #ffffff;
+}
+
+/* Header styling */
+h1, h2, h3 {
+    color: #9b87f5; /* Purple accent */
+}
+
+/* Button styling */
+.stButton > button {
+    border-radius: 8px;
+    padding: 0.5rem 1rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    background-color: #9b87f5;
+    color: #ffffff;
+}
+
+.stButton > button:hover {
+    background-color: #7E69AB;
+    box-shadow: none;
+    transform: none;
+}
+
+/* Form styling */
+.stTextArea, .stTextInput {
+    border-radius: 8px;
+}
+
+.stTextArea > div, .stTextInput > div {
+    border: 1px solid #d1d1d1;
+    background-color: #ffffff;
+}
+
+.stTextArea > div:focus, .stTextInput > div:focus {
+    border: 1px solid #9b87f5;
+}
+
+/* Card styling */
+[data-testid="stExpander"] {
+    border-radius: 10px;
+    border: 1px solid #e5e5e5;
+    margin-bottom: 1rem;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    background-color: #ffffff;
+}
+
+[data-testid="stExpander"]:hover {
+    box-shadow: none;
+    transform: none;
+}
+
+/* Slider styling - fixed to avoid highlighting issues */
+.stSlider > div > div > div {
+    background-color: #9b87f5 !important;
+}
+
+/* Remove selection highlight from slider values */
+.stSlider [role="slider"] {
+    background-color: #9b87f5 !important;
+    box-shadow: none !important;
+    outline: none !important;
+    border: none !important;
+}
+
+.stSlider [role="slider"]:focus,
+.stSlider [role="slider"]:active,
+.stSlider [role="slider"]:hover {
+    box-shadow: none !important;
+    outline: none !important;
+    border: none !important;
+}
+
+/* Fix highlighting on slider thumb */
+.streamlit-slider .thumb {
+    background-color: #9b87f5 !important;
+    border: none !important;
+    box-shadow: none !important;
+}
+
+.streamlit-slider .track {
+    background-color: rgba(155, 135, 245, 0.3) !important;
+}
+
+/* Remove selection highlight */
+.streamlit-slider .thumb:focus,
+.streamlit-slider .thumb:active,
+.streamlit-slider .thumb:hover {
+    box-shadow: none !important;
+    outline: none !important;
+    border: none !important;
+}
+
+/* Year slider specific fixes */
+[data-testid="stSlider"] [data-baseweb="slider"] {
+    background-color: #ffffff !important;
+}
+
+[data-testid="stSlider"] [data-baseweb="thumb"] {
+    background-color: #9b87f5 !important;
+    border-color: #9b87f5 !important;
+    box-shadow: none !important;
+}
+
+/* Book card styling */
+[data-testid="container"] {
+    background-color: #ffffff;
+    border-radius: 10px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    transition: all 0.3s ease;
+    border: 1px solid #e0e0e0;
+}
+
+[data-testid="container"]:hover {
+    box-shadow: none;
+    transform: none;
+}
+
+/* Tab styling */
+.stTabs [data-baseweb="tab-list"] {
+    gap: 1rem;
+    background-color: #ffffff;
+}
+
+.stTabs [data-baseweb="tab"] {
+    height: 4rem;
+    white-space: pre-wrap;
+    border-radius: 4px 4px 0 0;
+    gap: 0.5rem;
+    padding: 1rem 1.5rem;
+    font-weight: 600;
+    color: #555555;
+    background-color: #f3f3f3;
+}
+
+.stTabs [aria-selected="true"] {
+    background-color: rgba(155, 135, 245, 0.1) !important;
+    color: #9b87f5 !important;
+}
+
+/* Checkbox styling */
+.stCheckbox label {
+    color: #333333;
+}
+
+.stCheckbox [data-testid="stMarkdownContainer"] p {
+    font-size: 0.9rem;
+}
+
+/* Footer styling */
+footer {
+    text-align: center;
+    margin-top: 3rem;
+    color: #6b7280;
+}
+
+/* Links */
+a {
+    color: #9b87f5 !important;
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+/* Book cards grid */
+.book-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1rem;
+    background-color: #ffffff;
+}
+
+.book-card {
+    background-color: #ffffff;
+    border-radius: 10px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    transition: all 0.3s ease;
+    border: 1px solid #e0e0e0;
+}
+
+.book-card:hover {
+    box-shadow: none;
+    transform: none;
+}
+
+/* Dropdown - make it look better */
+.stSelectbox {
+    background-color: #ffffff;
+}
+
+.stSelectbox > div > div {
+    background-color: #ffffff;
+    border: 1px solid #d1d1d1;
+}
+
+/* Fix for the select genres dropdown */
+[data-testid="stExpander"] {
+    background-color: #ffffff !important;
+    border-color: #d1d1d1;
+}
+
+/* Override Streamlit's default dark theme elements */
+.stApp {
+    background-color: #f8f8f8 !important;
+}
+
+.stApp [data-testid="stAppViewContainer"] {
+    background-color: #f8f8f8 !important;
+}
+
+/* Make sure all text is readable */
+p, h1, h2, h3, h4, h5, h6, span, label, div {
+    color: #333333;
+}
+
+/* Override slider track colors */
+.stSlider [data-baseweb="track"] {
+    background-color: rgba(155, 135, 245, 0.3) !important;
+}
+
+.stSlider [data-baseweb="tick"] {
+    background-color: #9b87f5 !important;
+}
+
+/* Fix slider year labels */
+[data-testid="stSlider"] [data-testid="stTickBarMin"],
+[data-testid="stSlider"] [data-testid="stTickBarMax"] {
+    color: #333333 !important;
+}
+
+/* Put filters in a single horizontal line */
+.filter-row {
+    display: flex !important;
+    flex-direction: row !important;
+    gap: 2rem !important;
+    align-items: center !important;
+    width: 100% !important;
+    margin-bottom: 1rem !important;
+}
+
+.filter-row > div {
+    min-width: 0 !important;
+    flex: 1 !important;
+}
+
+/* Number of results slider - clean minimalist style */
+.number-results-slider {
+    padding: 0 !important;
+    margin: 0 !important;
+}
+
+.number-results-slider [data-testid="stSliderNumbers"] {
+    display: flex !important;
+    justify-content: space-between !important;
+}
+
+/* Fix selections being highlighted */
+::selection {
+    background-color: rgba(155, 135, 245, 0.2) !important;
+}
+
+/* Responsive design adjustments */
+@media (max-width: 768px) {
+    .main {
+        padding: 1rem;
+    }
+    
+    h1 {
+        font-size: 1.8rem !important;
+    }
+    
+    h2 {
+        font-size: 1.5rem !important;
+    }
+    
+    h3 {
+        font-size: 1.2rem !important;
+    }
+}
+
+/* Fix background colors for interactive elements */
+[data-testid="stForm"] {
+    background-color: #ffffff !important;
+    border-radius: 10px;
+    padding: 1rem;
+    border: 1px solid #e5e5e5;
+}
+"""
+
+# Apply the CSS
+st.markdown(f"<style>{css}</style>", unsafe_allow_html=True)
 
 # Session state initialization
 if 'chat_history' not in st.session_state:
@@ -44,20 +354,24 @@ def main():
     st.markdown("## Find Your Perfect Book")
     st.markdown("Stop wasting time on books that don't captivate you. Let our AI help you discover your next favorite read!")
     
-    # Tabs for navigation
+    # Tabs for navigation - minimal style like reference image
     tab1, tab2 = st.tabs(["Recommend", "About"])
     
     with tab1:
         # Main content 
-        st.markdown("<h2 style='text-align:center'>Find Your Next Great Read</h2>", unsafe_allow_html=True)
+        st.markdown("<h2>What book are you looking for?</h2>", unsafe_allow_html=True)
         st.write("Describe the perfect book you're looking for in detail. The more specific, the better!")
         
-        # Filters
+        # Filters header - more minimalist
         st.markdown("### Filters")
         
-        col1, col2 = st.columns(2)
+        # Put all filters in a single line with custom CSS class
+        st.markdown('<div class="filter-row">', unsafe_allow_html=True)
         
-        with col1:
+        # Create columns for the filters in a single row
+        filter_cols = st.columns(3)
+        
+        with filter_cols[0]:
             # Page range filter (single slider with predefined values)
             page_range = st.select_slider(
                 "Pages:",
@@ -65,15 +379,26 @@ def main():
                 value=('100', '700+')
             )
         
-        with col2:
+        with filter_cols[1]:
             # Publication year filter
             year_range = st.slider("Year Published:", 1950, 2025, (1950, 2025))
         
-        # Number of results slider
-        num_results = st.slider("Number of results:", min_value=1, max_value=10, value=5, step=1)
+        with filter_cols[2]:
+            # Number of results slider - clean minimalist style like reference
+            num_results = st.slider(
+                "Number of results:", 
+                min_value=1, 
+                max_value=10, 
+                value=5, 
+                step=1,
+                key="number_results_slider"
+            )
+        
+        st.markdown('</div>', unsafe_allow_html=True)
         
         # Genre selection using a collapsible section
-        with st.expander("Select Genres (check all that apply)", expanded=False):
+        with st.expander("Advanced Filters", expanded=False):
+            st.markdown("#### Select Genres")
             # Create a 5-column layout for genres
             genre_cols = st.columns(5)
             selected_genres = []
@@ -207,11 +532,27 @@ def main():
                             st.warning("You've reached the API rate limit. Please try again in a few minutes.")
     
     with tab2:
-        # ... keep existing code (About tab content)
+        # About tab with minimalist style like the reference image
+        st.markdown("<h2>About NovelQuest</h2>", unsafe_allow_html=True)
+        st.markdown("""
+        NovelQuest is an AI-powered book recommendation tool designed to help you find your next great read.
+        
+        **How it works:**
+        1. Describe what kind of book you're looking for
+        2. Add any specific preferences using the filters
+        3. Get personalized recommendations tailored just for you
+        
+        **Why NovelQuest:**
+        - Personalized recommendations based on your unique preferences
+        - Discover books you might never have found otherwise
+        - Save time searching through endless book reviews and lists
+        
+        This project uses Google's Gemini API to provide intelligent, context-aware book recommendations.
+        """)
             
     # Footer
-        st.markdown("---")
-        st.markdown("🔍 NovelQuest - Find your perfect book using AI | Made with ❤️ and Streamlit")
+    st.markdown("---")
+    st.markdown("🔍 NovelQuest - Find your perfect book using AI | Made with ❤️ and Streamlit")
 
 if __name__ == "__main__":
     if not api_key or api_key == "your_api_key_here":
