@@ -1,4 +1,3 @@
-
 import os
 import re
 import google.generativeai as genai
@@ -32,7 +31,7 @@ def get_book_recommendations(user_prompt, api_key, num_results=5, context=None):
     # System prompt with more specific format instructions to ensure consistent output
     # and explicitly asking not to include questions about book preferences
     system_prompt = f"""You are an AI that recommends books. Your task is to suggest exactly {num_results} books that match the user's description **very closely**. 
-    You will engage in a **conversation** with the user, refining recommendations based on their preferences.
+    You will engage in a **conversation** with the user, refining recommendations based on their preferences. BUT In the end of ur answer do not ask any follow up questions that ai cahtbots generally ask for for better user experience i dont need that here okay so do not.
     
     For each book, provide the following information in this EXACT format (follow this format precisely):
 
@@ -40,15 +39,15 @@ def get_book_recommendations(user_prompt, api_key, num_results=5, context=None):
     Author: <Author>
     Genre: <Genre 1>, <Genre 2>, <Genre 3> (List all applicable genres as a comma-separated list)
     Price: <Approximate price in INR (Indian Rupees), e.g. ₹499>
-    ai_reasoning: <Brief AI's reasoning for recommending this book>
+    ai_reasoning: <Brief reasoning for recommending this book like why the user will like it make it atelast 25 words.>
     Amazon Link:
     description: <description of the book atleast 75 words for each.>
 
     Repeat the above format for all {num_results} books. Do not include any other text between book recommendations. Number them as Book 1, Book 2, etc.
 
-    IMPORTANT: DO NOT include questions like "Are these the kind of books you're looking for?" or similar questions in your responses or in book descriptions. Simply provide the information in the format requested.
+    IMPORTANT: DO NOT include questions like "Are these the kind of books you're looking for?", "What do you think of these?", "Would you like me to refine the suggestions based on any specific preferences?", or similar conversational questions or follow-ups in your responses or in book descriptions. Simply provide the information in the format requested. for eg- 'What kind of thriller do you prefer? This will help me narrow down the suggestions.' JSUT GIVE ME THE DESCRIPTIONS DO NOT BE THE AI BOT AND ASK ANY FOLLOW UP QUESITON THAT YOU ARE PROGRAMMED TO ASK FOR.
 
-    After listing all {num_results} books, you can continue the conversation by asking questions.
+    After listing all {num_results} books, you can continue the conversation by asking clarifying questions related to refining recommendations, but **only after** all book information is presented.
     Do not end the conversation unless the user explicitly says they are done.
     Maintain a helpful and friendly tone. If the user's description is vague, ask for more details.
     List prices in Indian Rupees (₹) as these books will be purchased from Amazon India.
@@ -79,29 +78,38 @@ def extract_books_from_response(response_text):
     
     # More robust pattern that handles various formats AI might return
     # This regex is more forgiving about spacing, formatting and the Book X: prefix
-    book_pattern = r"(?:Book\s*\d*:?\s*)?Name:\s*(.*?)[\r\n]+\s*Author:\s*(.*?)[\r\n]+\s*Genre:\s*(.*?)[\r\n]+\s*Price:\s*(.*?)[\r\n]+\s*ai_reasoning:\s*(.*?)[\r\n]+\s*(?:Amazon Link:)?.*?[\r\n]+\s*description:\s*(.*?)(?=(?:\s*(?:Book\s*\d*:?\s*)?Name:)|$)"
+    # Modified to be more strict about what follows the description
+    # It now looks for the start of the next book OR the end of the string,
+    # ensuring it doesn't capture trailing conversational questions.
+    book_pattern = r"(?:Book\s*\d*:?\s*)?Name:\s*(.*?)[\r\n]+\s*Author:\s*(.*?)[\r\n]+\s*Genre:\s*(.*?)[\r\n]+\s*Price:\s*(.*?)[\r\n]+\s*ai_reasoning:\s*(.*?)[\r\n]+\s*(?:Amazon Link:)?.*?[\r\n]+\s*description:\s*(.*?)(?=\s*(?:Book\s*\d*:?\s*)?Name:|\Z)"
     
     # Find all matches
     matches = re.findall(book_pattern, response_text, re.DOTALL)
     
     # Debug the extraction
     print(f"Attempting to extract books from text with length {len(response_text)}")
-    print(f"Found {len(matches)} book matches")
+    print(f"Found {len(matches)} book matches with primary pattern")
     
+    # If the primary pattern doesn't find any books, try the fallback.
+    # The fallback pattern is less strict about the end of the description.
+    # However, after extraction, we'll aggressively remove trailing questions.
     if not matches:
-        # Super flexible fallback pattern - capture any book-like structure
         fallback_pattern = r"(?:.*?)(?:name|title|book):\s*(.*?)[\r\n]+.*?(?:author|by|writer):\s*(.*?)[\r\n]+.*?(?:genre|category|type):\s*(.*?)[\r\n]+.*?(?:price|cost):\s*(.*?)[\r\n]+.*?(?:reason|why|recommendation):\s*(.*?)[\r\n]+.*?(?:description|about|summary):\s*(.*?)(?=(?:.*?(?:name|title|book):)|$)"
         matches = re.findall(fallback_pattern, response_text, re.DOTALL | re.IGNORECASE)
-        
         print(f"Using fallback pattern, found {len(matches)} matches")
     
+    # Define a regex to catch common conversational questions at the end of a string
+    # This will be applied *after* extraction to fields that might contain them.
+    conversational_question_pattern = r"\s*(?:What do you think of these\?|Are these the kind of books you're looking for\?|Would you like me to refine the suggestions based on any specific preferences\?).*$"
+
+
     for match in matches:
         if len(match) == 6:
             name, author, genre, price, ai_reasoning, description = [item.strip() for item in match]
             
-            # Remove any questions from the description or ai_reasoning
-            description = re.sub(r'Are these the kind of books you\'re looking for\?.*$', '', description).strip()
-            ai_reasoning = re.sub(r'Are these the kind of books you\'re looking for\?.*$', '', ai_reasoning).strip()
+            # Aggressively remove any trailing conversational questions from description and reasoning
+            description = re.sub(conversational_question_pattern, '', description, flags=re.DOTALL).strip()
+            ai_reasoning = re.sub(conversational_question_pattern, '', ai_reasoning, flags=re.DOTALL).strip()
             
             # Generate a valid Amazon.in link
             amazon_link = generate_amazon_in_link(name, author)
