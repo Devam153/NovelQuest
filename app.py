@@ -144,8 +144,37 @@ def main():
                     if "429" in str(e):
                         st.warning("You've reached the API rate limit. Please try again in a few minutes or check your Gemini API quota at https://ai.google.dev/")
         
-        # Display books in an improved layout if available
+        # Display "Continue the Conversation" BEFORE book recommendations if books are available
         if st.session_state.books:
+            # MOVED: Continue conversation section now appears before book recommendations
+            st.markdown("### Continue the Conversation")
+            st.write("Not satisfied with these recommendations? Ask follow-up questions or refine your search!")
+            
+            followup_input = st.text_input("Your follow-up question:", key="followup")
+            if st.button("Send", key="send_followup") and followup_input and api_key:
+                with st.spinner("Getting more recommendations..."):
+                    try:
+                        # Create context from previous conversation
+                        context = "\n".join([f"{msg['role']}: {msg['content']}" for msg in st.session_state.chat_history])
+                        response = get_book_recommendations(followup_input, api_key, num_results=num_results, context=context)
+                        
+                        # Extract books from response
+                        new_books = extract_books_from_response(response)
+                        
+                        if new_books:
+                            st.session_state.books = new_books
+                            st.session_state.chat_history.append({"role": "user", "content": followup_input})
+                            st.session_state.chat_history.append({"role": "assistant", "content": response})
+                            # Proper rerun
+                            st.rerun()
+                        else:
+                            st.warning("I couldn't find new recommendations. Please try a different question.")
+                    except Exception as e:
+                        st.error(f"An error occurred: {str(e)}")
+                        if "429" in str(e):
+                            st.warning("You've reached the API rate limit. Please try again in a few minutes.")
+            
+            # Display book recommendations AFTER the conversation section
             st.markdown("## Your Personalized Book Recommendations")
             
             # Calculate number of columns (2 for desktop view)
@@ -183,34 +212,6 @@ def main():
                                 # Amazon link (now using Amazon.in)
                                 if 'amazon_link' in book and book['amazon_link']:
                                     st.markdown(f"[Buy on Amazon India]({book['amazon_link']})")
-            
-            # Continue conversation section
-            st.markdown("### Continue the Conversation")
-            st.write("Not satisfied with these recommendations? Ask follow-up questions or refine your search!")
-            
-            followup_input = st.text_input("Your follow-up question:", key="followup")
-            if st.button("Send", key="send_followup") and followup_input and api_key:
-                with st.spinner("Getting more recommendations..."):
-                    try:
-                        # Create context from previous conversation
-                        context = "\n".join([f"{msg['role']}: {msg['content']}" for msg in st.session_state.chat_history])
-                        response = get_book_recommendations(followup_input, api_key, num_results=num_results, context=context)
-                        
-                        # Extract books from response
-                        new_books = extract_books_from_response(response)
-                        
-                        if new_books:
-                            st.session_state.books = new_books
-                            st.session_state.chat_history.append({"role": "user", "content": followup_input})
-                            st.session_state.chat_history.append({"role": "assistant", "content": response})
-                            # Proper rerun
-                            st.rerun()
-                        else:
-                            st.warning("I couldn't find new recommendations. Please try a different question.")
-                    except Exception as e:
-                        st.error(f"An error occurred: {str(e)}")
-                        if "429" in str(e):
-                            st.warning("You've reached the API rate limit. Please try again in a few minutes.")
     
     with tab2:
         # About tab with minimalist style like the reference image
@@ -233,7 +234,7 @@ def main():
             
     # Footer
     st.markdown("---")
-    st.markdown("🔍 NovelQuest - Find your perfect book using AI | Made with ❤️ and Streamlit")
+    st.markdown("🔍 NovelQuest - Find the book you would want to read | Made with ❤️ and Streamlit")
 
 if __name__ == "__main__":
     if not api_key or api_key == "your_api_key_here":
