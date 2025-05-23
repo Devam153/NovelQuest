@@ -16,15 +16,13 @@ def generate_amazon_in_link(book_title, author):
 
 def get_book_recommendations(user_prompt, api_key, num_results=5, context=None):
     """Get book recommendations from Gemini API based on user prompt."""
-    # Configure Gemini
     configure_genai(api_key)
     
-    # Create the model
     generation_config = {
         "temperature": 0.5,
         "top_p": 0.95,
         "top_k": 40,
-        "max_output_tokens": 2048,  # Increased token limit
+        "max_output_tokens": 2048,  
         "response_mime_type": "text/plain",
     }
     
@@ -107,11 +105,9 @@ def extract_books_from_response(response_text):
         if len(match) == 6:
             name, author, genre, price, ai_reasoning, description = [item.strip() for item in match]
             
-            # Aggressively remove any trailing conversational questions from description and reasoning
             description = re.sub(conversational_question_pattern, '', description, flags=re.DOTALL).strip()
             ai_reasoning = re.sub(conversational_question_pattern, '', ai_reasoning, flags=re.DOTALL).strip()
             
-            # Generate a valid Amazon.in link
             amazon_link = generate_amazon_in_link(name, author)
             
             book = {
