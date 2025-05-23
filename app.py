@@ -33,7 +33,7 @@ genre_options = [
 
 def main():
     # Header
-    st.title("NovelQuest")
+    st.markdown("<h1 style='margin-bottom: -30px; margin-top: -35px;'>NovelQuest</h1>", unsafe_allow_html=True)
     st.markdown("## Find Your Perfect Book")
     st.markdown("Stop wasting time on books that don't captivate you. Let our AI help you discover your next favorite read!")
     
