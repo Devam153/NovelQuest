@@ -3,6 +3,7 @@ import re
 import google.generativeai as genai
 import time
 import urllib.parse
+import requests
 
 def configure_genai(api_key):
     """Configure the Gemini API with the provided API key."""
@@ -13,6 +14,20 @@ def generate_amazon_in_link(book_title, author):
     query = f"{book_title} {author} book"
     encoded_query = urllib.parse.quote(query)
     return f"https://www.amazon.in/s?k={encoded_query}"
+
+def fetch_cover_via_google(title, author):
+    """Query Google Books for a thumbnail cover image."""
+    query = f"intitle:{title}+inauthor:{author}"
+    try:
+        resp = requests.get(
+            "https://www.googleapis.com/books/v1/volumes",
+            params={"q": query, "maxResults": 1},
+            timeout=5
+        )
+        data = resp.json()
+        return data["items"][0]["volumeInfo"]["imageLinks"]["thumbnail"]
+    except Exception:
+        return None
 
 def get_book_recommendations(user_prompt, api_key, num_results=5, context=None):
     """Get book recommendations from Gemini API based on user prompt."""
@@ -109,6 +124,7 @@ def extract_books_from_response(response_text):
             ai_reasoning = re.sub(conversational_question_pattern, '', ai_reasoning, flags=re.DOTALL).strip()
             
             amazon_link = generate_amazon_in_link(name, author)
+            cover_url = fetch_cover_via_google(name, author) or "https://i.imgur.com/YsaUJOQ.png"
             
             book = {
                 "name": name,
@@ -117,6 +133,7 @@ def extract_books_from_response(response_text):
                 "price": price,
                 "ai_reasoning": ai_reasoning,
                 "amazon_link": amazon_link,
+                "cover_url": cover_url,
                 "description": description
             }
             
