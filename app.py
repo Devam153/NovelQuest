@@ -190,14 +190,34 @@ def main():
                         book = st.session_state.books[idx]
                         with cols[j]:
                             with st.container(border=True):
-                                st.markdown(f"### {book['name']}")
+                                st.subheader(book["name"]) # Option B: Escape Markdown by backticks TO PREVENT * ... *
                                 
                                 # Book details in a two-column layout
-                                img_col, info_col = st.columns([1, 2])
+                                img_col, info_col = st.columns([1, 3], gap="small")
                                 
                                 with img_col:
-                                    # Show a placeholder book cover
-                                    st.image("https://i.imgur.com/YsaUJOQ.png", width=150)
+                                    st.markdown(
+                                        f"""
+                                        <div style="
+                                            width: 150px;    /* fixed display width */
+                                            height: 225px;   /* fixed display height */
+                                            overflow: hidden;
+                                            margin-bottom: 15px;>
+                                            
+                                        <img
+                                            src="{book['cover_url']}"
+                                            style="
+                                            width: 150px;
+                                            height: 225px;
+                                            object-fit: cover;   /* crop & fill the box */
+                                            display: block;
+                                            "
+                                            alt="Cover art for {book['name']}"
+                                        />
+                                        </div>
+                                        """,
+                                        unsafe_allow_html=True,
+                                    )
                                 
                                 with info_col:
                                     st.markdown(f"**Author:** {book['author']}")
