@@ -196,28 +196,7 @@ def main():
                                 img_col, info_col = st.columns([1, 3], gap="small")
                                 
                                 with img_col:
-                                    st.markdown(
-                                        f"""
-                                        <div style="
-                                            width: 150px;    /* fixed display width */
-                                            height: 225px;   /* fixed display height */
-                                            overflow: hidden;
-                                            margin-bottom: 15px;>
-                                            
-                                        <img
-                                            src="{book['cover_url']}"
-                                            style="
-                                            width: 150px;
-                                            height: 225px;
-                                            object-fit: cover;   /* crop & fill the box */
-                                            display: block;
-                                            "
-                                            alt="Cover art for {book['name']}"
-                                        />
-                                        </div>
-                                        """,
-                                        unsafe_allow_html=True,
-                                    )
+                                    st.image(book["cover_url"], width=150)
                                 
                                 with info_col:
                                     st.markdown(f"**Author:** {book['author']}")
