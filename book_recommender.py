@@ -15,19 +15,34 @@ def generate_amazon_in_link(book_title, author):
     encoded_query = urllib.parse.quote(query)
     return f"https://www.amazon.in/s?k={encoded_query}"
 
-def fetch_cover_via_google(title, author):
-    """Query Google Books for a thumbnail cover image."""
-    query = f"intitle:{title}+inauthor:{author}"
+def fetch_cover_via_openlibrary(title, author):
+    """
+    Search OpenLibrary for title+author, grab the first cover_i or ISBN,
+    and return the medium-size cover URL.
+    """
     try:
         resp = requests.get(
-            "https://www.googleapis.com/books/v1/volumes",
-            params={"q": query, "maxResults": 1},
+            "https://openlibrary.org/search.json",
+            params={"title": title, "author": author, "limit": 1},
             timeout=5
         )
         data = resp.json()
-        return data["items"][0]["volumeInfo"]["imageLinks"]["thumbnail"]
+        docs = data.get("docs", [])
+        if not docs:
+            return None
+
+        doc = docs[0]
+        # 1) Try cover_i
+        if doc.get("cover_i"):
+            cover_id = doc["cover_i"]
+            return f"https://covers.openlibrary.org/b/id/{cover_id}-M.jpg"
+        # 2) Fallback to ISBN
+        if doc.get("isbn"):
+            isbn = doc["isbn"][0]
+            return f"https://covers.openlibrary.org/b/isbn/{isbn}-M.jpg"
     except Exception:
-        return None
+        pass
+    return None
 
 def get_book_recommendations(user_prompt, api_key, num_results=5, context=None):
     """Get book recommendations from Gemini API based on user prompt."""
@@ -124,7 +139,7 @@ def extract_books_from_response(response_text):
             ai_reasoning = re.sub(conversational_question_pattern, '', ai_reasoning, flags=re.DOTALL).strip()
             
             amazon_link = generate_amazon_in_link(name, author)
-            cover_url = fetch_cover_via_google(name, author) or "https://i.imgur.com/YsaUJOQ.png"
+            cover_url = fetch_cover_via_openlibrary(name, author) or "https://i.imgur.com/YsaUJOQ.png"
             
             book = {
                 "name": name,
