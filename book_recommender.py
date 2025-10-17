@@ -17,8 +17,7 @@ def generate_amazon_in_link(book_title, author):
 
 def fetch_cover_via_openlibrary(title, author):
     """
-    Search OpenLibrary for title+author, grab the first cover_i or ISBN,
-    and return the medium-size cover URL.
+    Search OpenLibrary for title+author, grab the first cover_i or ISBN.
     """
     try:
         resp = requests.get(
@@ -32,11 +31,11 @@ def fetch_cover_via_openlibrary(title, author):
             return None
 
         doc = docs[0]
-        # 1) Try cover_i
+        # try cover_i
         if doc.get("cover_i"):
             cover_id = doc["cover_i"]
             return f"https://covers.openlibrary.org/b/id/{cover_id}-M.jpg"
-        # 2) Fallback to ISBN
+        #fallback to ISBN
         if doc.get("isbn"):
             isbn = doc["isbn"][0]
             return f"https://covers.openlibrary.org/b/isbn/{isbn}-M.jpg"
@@ -56,8 +55,7 @@ def get_book_recommendations(user_prompt, api_key, num_results=5, context=None):
         "response_mime_type": "text/plain",
     }
     
-    # System prompt with more specific format instructions to ensure consistent output
-    # and explicitly asking not to include questions about book preferences
+    
     system_prompt = f"""You are an AI that recommends books. Your task is to suggest exactly {num_results} books that match the user's description **very closely**. 
     You will engage in a **conversation** with the user, refining recommendations based on their preferences. BUT In the end of ur answer do not ask any follow up questions that ai cahtbots generally ask for for better user experience i dont need that here okay so do not.
     
@@ -104,23 +102,17 @@ def extract_books_from_response(response_text):
     """Extract structured book information from the AI response and generate valid Amazon links."""
     books = []
     
-    # More robust pattern that handles various formats AI might return
-    # This regex is more forgiving about spacing, formatting and the Book X: prefix
-    # Modified to be more strict about what follows the description
+    # regex expression with only giving in the necessary details
     # It now looks for the start of the next book OR the end of the string,
     # ensuring it doesn't capture trailing conversational questions.
     book_pattern = r"(?:Book\s*\d*:?\s*)?Name:\s*(.*?)[\r\n]+\s*Author:\s*(.*?)[\r\n]+\s*Genre:\s*(.*?)[\r\n]+\s*Price:\s*(.*?)[\r\n]+\s*ai_reasoning:\s*(.*?)[\r\n]+\s*(?:Amazon Link:)?.*?[\r\n]+\s*description:\s*(.*?)(?=\s*(?:Book\s*\d*:?\s*)?Name:|\Z)"
     
-    # Find all matches
     matches = re.findall(book_pattern, response_text, re.DOTALL)
     
-    # Debug the extraction
     print(f"Attempting to extract books from text with length {len(response_text)}")
     print(f"Found {len(matches)} book matches with primary pattern")
     
-    # If the primary pattern doesn't find any books, try the fallback.
-    # The fallback pattern is less strict about the end of the description.
-    # However, after extraction, we'll aggressively remove trailing questions.
+    # try fallback.
     if not matches:
         fallback_pattern = r"(?:.*?)(?:name|title|book):\s*(.*?)[\r\n]+.*?(?:author|by|writer):\s*(.*?)[\r\n]+.*?(?:genre|category|type):\s*(.*?)[\r\n]+.*?(?:price|cost):\s*(.*?)[\r\n]+.*?(?:reason|why|recommendation):\s*(.*?)[\r\n]+.*?(?:description|about|summary):\s*(.*?)(?=(?:.*?(?:name|title|book):)|$)"
         matches = re.findall(fallback_pattern, response_text, re.DOTALL | re.IGNORECASE)

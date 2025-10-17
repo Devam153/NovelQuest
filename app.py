@@ -144,9 +144,8 @@ def main():
                     if "429" in str(e):
                         st.warning("You've reached the API rate limit. Please try again in a few minutes or check your Gemini API quota at https://ai.google.dev/")
         
-        # Display "Continue the Conversation" BEFORE book recommendations if books are available
+        # Display "Continue the Conversation" before recommendations
         if st.session_state.books:
-            # MOVED: Continue conversation section now appears before book recommendations
             st.markdown("### Continue the Conversation")
             st.write("Not satisfied with these recommendations? Ask follow-up questions or refine your search!")
             
@@ -158,14 +157,12 @@ def main():
                         context = "\n".join([f"{msg['role']}: {msg['content']}" for msg in st.session_state.chat_history])
                         response = get_book_recommendations(followup_input, api_key, num_results=num_results, context=context)
                         
-                        # Extract books from response
                         new_books = extract_books_from_response(response)
                         
                         if new_books:
                             st.session_state.books = new_books
                             st.session_state.chat_history.append({"role": "user", "content": followup_input})
                             st.session_state.chat_history.append({"role": "assistant", "content": response})
-                            # Proper rerun
                             st.rerun()
                         else:
                             st.warning("I couldn't find new recommendations. Please try a different question.")
@@ -174,10 +171,9 @@ def main():
                         if "429" in str(e):
                             st.warning("You've reached the API rate limit. Please try again in a few minutes.")
             
-            # Display book recommendations AFTER the conversation section
+            # Display recommendations after the conversation section
             st.markdown("## Your Personalized Book Recommendations")
             
-            # Calculate number of columns (2 for desktop view)
             cols_per_row = 2
             
             # Create rows of books
@@ -190,7 +186,7 @@ def main():
                         book = st.session_state.books[idx]
                         with cols[j]:
                             with st.container(border=True):
-                                st.subheader(book["name"]) # Option B: Escape Markdown by backticks TO PREVENT * ... *
+                                st.subheader(book["name"])
                                 
                                 # Book details in a two-column layout
                                 img_col, info_col = st.columns([1, 3], gap="small")
