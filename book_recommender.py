@@ -118,10 +118,9 @@ def extract_books_from_response(response_text):
         matches = re.findall(fallback_pattern, response_text, re.DOTALL | re.IGNORECASE)
         print(f"Using fallback pattern, found {len(matches)} matches")
     
-    # Define a regex to catch common conversational questions at the end of a string
-    # This will be applied *after* extraction to fields that might contain them.
+    # Define a regex to catch common  questions at the end of a string
+    # This will be applied after extraction to fields that might contain them.
     conversational_question_pattern = r"\s*(?:What do you think of these\?|Are these the kind of books you're looking for\?|Would you like me to refine the suggestions based on any specific preferences\?).*$"
-
 
     for match in matches:
         if len(match) == 6:
